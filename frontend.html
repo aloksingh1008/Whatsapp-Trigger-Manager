@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Trigger Manager - V8.0 HEIGHT FIXED</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- Version: 2024-01-15-16:35 - V8.0 HEIGHT FIXED -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .whatsapp-container {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            background: #fff;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .whatsapp-container.active {
+            display: block;
+        }
+
+        .whatsapp-container.active ~ .container {
+            display: none;
+        }
+
+        .whatsapp-header {
+            background: #075e54;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .whatsapp-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .whatsapp-layout {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        .contacts-panel {
+            width: 35%;
+            border-right: 1px solid #e1e5e9;
+            background: #f7f7f7;
+            overflow-y: auto;
+        }
+
+        .chat-panel {
+            width: 65%;
+            display: flex;
+            flex-direction: column;
+            background: #e5ddd5;
+            height: 100%;
+        }
+
+        .contacts-header {
+            background: #f0f0f0;
+            padding: 15px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .contacts-search {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .contact-item {
+            padding: 18px 20px;
+            border-bottom: 1px solid #e1e5e9;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .contact-item:hover {
+            background: #f0f0f0;
+        }
+
+        .contact-item.active {
+            background: #e7f3ff;
+        }
+
+        .contact-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #25d366;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        .contact-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .contact-last-message {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4;
+        }
+
+        .contact-time {
+            font-size: 12px;
+            color: #999;
+            margin-left: 15px;
+            flex-shrink: 0;
+        }
+
+        .contact-number-header {
+            background: #25d366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #128c7e;
+            flex-shrink: 0;
+            order: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .contact-number-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .phone-toggle-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+            min-width: 60px;
+        }
+
+        .phone-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .phone-toggle-btn.active {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: #e5ddd5;
+            order: 2;
+            min-height: 0;
+        }
+
+
+        .message-row {
+            margin-bottom: 25px;
+            clear: both;
+            padding: 5px 0;
+        }
+
+        .message-row.sent {
+            text-align: right;
+        }
+
+        .message-row.received {
+            text-align: left;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            padding: 18px 25px;
+            border-radius: 25px;
+            max-width: 70%;
+            word-wrap: break-word;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.5;
+            margin: 8px 0;
+        }
+
+        .message-row.sent .message-bubble {
+            background: #dcf8c6;
+            color: #000;
+            border: 3px solid #25d366;
+        }
+
+        .message-row.received .message-bubble {
+            background: #ffffff;
+            color: #000;
+            border: 3px solid #128c7e;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            font-weight: normal;
+            padding: 0 5px;
+        }
+
+        .no-messages {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .no-contact-selected {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+            background: #f7f7f7;
+        }
+
+        .message-input-container {
+            background: #f0f0f0;
+            padding: 15px 20px;
+            border-top: 1px solid #e1e5e9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            order: 3;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            max-height: 100px;
+            min-height: 40px;
+        }
+
+        .message-input:focus {
+            border-color: #25d366;
+        }
+
+        .send-btn {
+            background: #25d366;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background 0.3s;
+        }
+
+        .send-btn:hover {
+            background: #128c7e;
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .new-message-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #25d366;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .header {
+            background: #25d366;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .add-trigger-btn {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+
+        .add-trigger-btn:hover {
+            background: #128c7e;
+        }
+
+        .dashboard-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e1e5e9;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .dashboard-header h2 {
+            margin: 0;
+            color: #25d366;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .refresh-dashboard-btn {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .refresh-dashboard-btn:hover {
+            background: #128c7e;
+            transform: translateY(-1px);
+        }
+
+        .dashboard-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e1e5e9;
+            border-radius: 10px;
+        }
+
+        .dashboard-message-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 2fr 1fr;
+            gap: 15px;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f8f8f8;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .dashboard-message-item:hover {
+            background: #f8f9fa;
+        }
+
+        .dashboard-message-item:last-child {
+            border-bottom: none;
+        }
+
+        .dashboard-message-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 2fr 1fr;
+            gap: 15px;
+            padding: 15px 20px;
+            background: #f0f2f5;
+            border-bottom: 2px solid #e1e5e9;
+            font-weight: 700;
+            color: #333;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .dashboard-trigger-name {
+            font-weight: 600;
+            color: #25d366;
+        }
+
+        .dashboard-sender-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .dashboard-phone-number {
+            font-family: monospace;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .dashboard-message-content {
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .dashboard-timestamp {
+            color: #666;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .dashboard-no-messages {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .triggers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .trigger-card {
+            background: white;
+            border-radius: 15px;
+            padding: 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #e1e5e9;
+        }
+
+        .trigger-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .trigger-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .trigger-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #25d366;
+            margin: 0;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .trigger-info {
+            margin-bottom: 25px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f8f8f8;
+            gap: 20px;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 600;
+            min-width: 120px;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+            word-break: break-all;
+            text-align: right;
+            flex: 1;
+            padding-left: 10px;
+        }
+
+        .trigger-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 100px;
+        }
+
+        .btn-primary {
+            background: #25d366;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #128c7e;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #25d366;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        /* Messages Modal */
+        .messages-modal {
+            max-width: 800px;
+        }
+
+        .messages-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .messages-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .message-item {
+            background: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #25d366;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .message-content {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .no-messages {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #25d366;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        .chat-view {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .triggers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <div class="header">
+            <h1>WhatsApp Trigger Manager</h1>
+        </div>
+
+        <button class="add-trigger-btn" onclick="openAddTriggerModal()">
+            ➕ Add New Trigger
+        </button>
+
+        <div id="triggers-container" class="triggers-grid">
+            <div class="loading">
+                <div class="spinner"></div>
+                Loading triggers...
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div class="dashboard-section">
+            <div class="dashboard-header">
+                <h2>📊 Messages Dashboard</h2>
+                <button class="refresh-dashboard-btn" onclick="refreshDashboard()" title="Refresh Dashboard">
+                    🔄 Refresh
+                </button>
+            </div>
+            <div class="dashboard-content">
+                <div id="dashboard-messages" class="dashboard-messages">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading dashboard...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Interface -->
+    <div class="whatsapp-container" id="whatsapp-container">
+        <div class="whatsapp-header">
+            <button class="back-btn" onclick="showMainView()">←</button>
+            <h2 id="whatsapp-title">WhatsApp Messages</h2>
+        </div>
+        
+        <div class="whatsapp-layout">
+            <!-- Contacts Panel -->
+            <div class="contacts-panel">
+                <div class="contacts-header">
+                    <input type="text" class="contacts-search" placeholder="Search contacts..." id="contacts-search">
+                </div>
+                <div id="contacts-list">
+                    <!-- Contacts will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Chat Panel -->
+<div class="chat-panel">
+    <div id="no-contact-selected" class="no-contact-selected">
+        <div>
+            <h3>Select a contact to start chatting</h3>
+            <p>Choose a contact from the list to view messages</p>
+        </div>
+    </div>
+    
+    <div id="chat-view" style="display: none;" class="chat-view">
+        <!-- Contact Number at Top -->
+        <div class="contact-number-header">
+            <h2 id="chat-contact-number-display">+1234567890</h2>
+            <button class="phone-toggle-btn" id="phone-toggle-btn" onclick="togglePhoneNumber()" title="Show/Hide Phone Number">
+                📱
+            </button>
+        </div>
+        
+        <!-- Messages in Middle -->
+        <div class="messages-container" id="messages-container">
+            <!-- Messages will be loaded here -->
+        </div>
+        
+        <!-- Input at Bottom -->
+        <div class="message-input-container">
+            <textarea 
+                class="message-input" 
+                id="message-input" 
+                placeholder="Type a message..."
+                rows="1"
+            ></textarea>
+            <button class="send-btn" id="send-btn" onclick="sendMessage()">
+                ➤
+            </button>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+
+    <!-- Add Trigger Modal -->
+    <div id="addTriggerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addTriggerModal')">&times;</span>
+            <h2>Add New WhatsApp Trigger</h2>
+            <form id="addTriggerForm">
+                <div class="form-group">
+                    <label for="businessName">Business Name</label>
+                    <input type="text" id="businessName" name="business_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="appId">Meta App ID</label>
+                    <input type="text" id="appId" name="app_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="phoneId">Phone Number ID</label>
+                    <input type="text" id="phoneId" name="phone_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="accessToken">Access Token</label>
+                    <input type="text" id="accessToken" name="access_token" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addTriggerModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Trigger</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Messages Modal -->
+    <div id="messagesModal" class="modal">
+        <div class="modal-content messages-modal">
+            <span class="close" onclick="closeModal('messagesModal')">&times;</span>
+            <div class="messages-header">
+                <h2 id="messagesTitle">Messages</h2>
+                <button class="btn btn-primary" onclick="refreshMessages()">🔄 Refresh</button>
+            </div>
+            <div id="messagesList" class="messages-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading messages...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTriggerId = null;
+        let currentContact = null;
+        let allMessages = [];
+        let contacts = [];
+        let messagePollingInterval = null;
+        let dashboardPollingInterval = null;
+        let showPhoneNumber = false; // Toggle state for phone number display
+
+        // Load triggers and dashboard on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTriggers();
+            loadDashboard();
+            startDashboardPolling();
+            
+            // Add search functionality
+            document.getElementById('contacts-search').addEventListener('input', function(e) {
+                filterContacts(e.target.value);
+            });
+            
+            // Add message input functionality
+            const messageInput = document.getElementById('message-input');
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // Auto-resize textarea
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+            });
+        });
+
+        // Load all triggers
+        async function loadTriggers() {
+            try {
+                const response = await fetch('/api/triggers');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayTriggers(data.data);
+                } else {
+                    showError('Failed to load triggers');
+                }
+            } catch (error) {
+                showError('Error loading triggers: ' + error.message);
+            }
+        }
+
+        // Load dashboard messages
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/dashboard/messages');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayDashboardMessages(data.data);
+                } else {
+                    document.getElementById('dashboard-messages').innerHTML = 
+                        '<div class="dashboard-no-messages">Failed to load dashboard messages</div>';
+                }
+            } catch (error) {
+                document.getElementById('dashboard-messages').innerHTML = 
+                    '<div class="dashboard-no-messages">Error loading dashboard: ' + error.message + '</div>';
+            }
+        }
+
+        // Manual dashboard refresh with visual feedback
+        async function refreshDashboard() {
+            const refreshBtn = document.querySelector('.refresh-dashboard-btn');
+            const originalText = refreshBtn.innerHTML;
+            
+            // Show loading state
+            refreshBtn.innerHTML = '⏳';
+            refreshBtn.disabled = true;
+            
+            try {
+                await loadDashboard();
+                // Show success state briefly
+                refreshBtn.innerHTML = '✅';
+                setTimeout(() => {
+                    refreshBtn.innerHTML = originalText;
+                    refreshBtn.disabled = false;
+                }, 1000);
+            } catch (error) {
+                // Show error state
+                refreshBtn.innerHTML = '❌';
+                setTimeout(() => {
+                    refreshBtn.innerHTML = originalText;
+                    refreshBtn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        // Display dashboard messages
+        function displayDashboardMessages(messages) {
+            const dashboardContainer = document.getElementById('dashboard-messages');
+            
+            if (!messages || messages.length === 0) {
+                dashboardContainer.innerHTML = '<div class="dashboard-no-messages">No messages yet</div>';
+                return;
+            }
+
+            let html = `
+                <div class="dashboard-message-header">
+                    <div>Trigger Name</div>
+                    <div>Sender Name</div>
+                    <div>Phone Number</div>
+                    <div>Message</div>
+                    <div>Timestamp</div>
+                </div>
+            `;
+
+            messages.forEach(message => {
+                const senderName = message.contact_name_only || 'Unknown';
+                const phoneNumber = message.sender_number.startsWith('sent_to_') 
+                    ? message.sender_number.replace('sent_to_', '') 
+                    : message.sender_number;
+                const messageContent = message.message_content || '[No content]';
+                const timestamp = formatTime(message.received_at);
+                const isSent = message.sender_number.startsWith('sent_to_');
+
+                html += `
+                    <div class="dashboard-message-item">
+                        <div class="dashboard-trigger-name">${message.business_name}</div>
+                        <div class="dashboard-sender-name">${isSent ? 'You' : senderName}</div>
+                        <div class="dashboard-phone-number">${formatPhoneNumber(phoneNumber)}</div>
+                        <div class="dashboard-message-content">${messageContent}</div>
+                        <div class="dashboard-timestamp">${timestamp}</div>
+                    </div>
+                `;
+            });
+
+            dashboardContainer.innerHTML = html;
+        }
+
+        // Display triggers
+        function displayTriggers(triggers) {
+            const container = document.getElementById('triggers-container');
+            
+            if (triggers.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                        <h3>No triggers found</h3>
+                        <p>Create your first WhatsApp trigger to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = triggers.map(trigger => `
+                <div class="trigger-card">
+                    <div class="trigger-header">
+                        <div class="trigger-name">${trigger.business_name}</div>
+                        <div class="status-badge status-${trigger.status}">${trigger.status}</div>
+                    </div>
+                    <div class="trigger-info">
+                        <div class="info-item">
+                            <span class="info-label">Node ID:</span>
+                            <span class="info-value">${trigger.node_id}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Phone ID:</span>
+                            <span class="info-value">${trigger.phone_id}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Callback URL:</span>
+                            <span class="info-value">${trigger.callback_url}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Verify Token:</span>
+                            <span class="info-value">${trigger.verify_token}</span>
+                        </div>
+                    </div>
+                    <div class="trigger-actions">
+                        <button class="btn btn-primary" onclick="toggleTrigger(${trigger.id}, '${trigger.status}')">
+                            ${trigger.status === 'active' ? '⏸️ Deactivate' : '▶️ Activate'}
+                        </button>
+                        <button class="btn btn-secondary" onclick="openWhatsAppChat(${trigger.id}, '${trigger.business_name}')">
+                            💬 Chat
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteTrigger(${trigger.id}, '${trigger.business_name}')">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Toggle trigger status
+        async function toggleTrigger(triggerId, currentStatus) {
+            try {
+                const response = await fetch(`/api/triggers/${triggerId}/toggle`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(data.message);
+                    loadTriggers(); // Reload triggers
+                } else {
+                    showError(data.error || 'Failed to toggle trigger');
+                }
+            } catch (error) {
+                showError('Error toggling trigger: ' + error.message);
+            }
+        }
+
+        // Delete trigger
+        async function deleteTrigger(triggerId, businessName) {
+            const confirmed = confirm(`Are you sure you want to delete "${businessName}"?\n\nThis will permanently delete the trigger and all its messages. This action cannot be undone.`);
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/triggers/${triggerId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(data.message);
+                    loadTriggers(); // Reload triggers
+                } else {
+                    showError(data.error || 'Failed to delete trigger');
+                }
+            } catch (error) {
+                showError('Error deleting trigger: ' + error.message);
+            }
+        }
+
+        // Open WhatsApp chat interface
+        async function openWhatsAppChat(triggerId, businessName) {
+            currentTriggerId = triggerId;
+            document.getElementById('whatsapp-title').textContent = `${businessName} - WhatsApp`;
+            
+            // Show WhatsApp interface
+            document.getElementById('whatsapp-container').classList.add('active');
+            
+            // Stop dashboard polling when in WhatsApp interface
+            stopDashboardPolling();
+            
+            // Load messages and contacts
+            await loadMessages(triggerId);
+            await loadContacts();
+            
+            // Start auto-refresh for new messages
+            startMessagePolling();
+        }
+
+        // Show main view
+        function showMainView() {
+            document.getElementById('whatsapp-container').classList.remove('active');
+            
+            // Stop message polling
+            stopMessagePolling();
+            
+            // Restart dashboard polling when returning to main view
+            startDashboardPolling();
+            
+            currentTriggerId = null;
+            currentContact = null;
+        }
+
+        // Load messages for a trigger
+        async function loadMessages(triggerId) {
+            try {
+                const response = await fetch(`/api/triggers/${triggerId}/messages`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    allMessages = data.data;
+                    return data.data;
+                } else {
+                    allMessages = [];
+                    return [];
+                }
+            } catch (error) {
+                allMessages = [];
+                return [];
+            }
+        }
+
+        // Load contacts from messages
+        async function loadContacts() {
+            if (!allMessages || allMessages.length === 0) {
+                document.getElementById('contacts-list').innerHTML = '<div class="no-messages">No messages yet</div>';
+                return;
+            }
+
+            // Group messages by contact (phone number)
+            const contactMap = new Map();
+            
+            allMessages.forEach(message => {
+                let contactNumber;
+                
+                // Determine the actual contact number
+                if (message.sender_number.startsWith('sent_to_')) {
+                    // This is a sent message, extract the recipient number
+                    contactNumber = message.sender_number.replace('sent_to_', '');
+                } else {
+                    // This is a received message, use sender number
+                    contactNumber = message.sender_number;
+                }
+                
+                if (!contactMap.has(contactNumber)) {
+                    contactMap.set(contactNumber, {
+                        number: contactNumber,
+                        displayName: message.contact_name_only || message.display_name || contactNumber,
+                        contactNameOnly: message.contact_name_only,
+                        lastMessage: message.message_content,
+                        lastTime: message.received_at,
+                        messageCount: 0,
+                        isLastMessageSent: message.sender_number.startsWith('sent_to_')
+                    });
+                }
+                
+                const contact = contactMap.get(contactNumber);
+                contact.messageCount++;
+                
+                // Update with the most recent message
+                if (new Date(message.received_at) > new Date(contact.lastTime)) {
+                    contact.lastMessage = message.message_content;
+                    contact.lastTime = message.received_at;
+                    contact.isLastMessageSent = message.sender_number.startsWith('sent_to_');
+                }
+            });
+
+            // Convert to array and sort by last message time
+            contacts = Array.from(contactMap.values()).sort((a, b) => 
+                new Date(b.lastTime) - new Date(a.lastTime)
+            );
+
+            displayContacts();
+        }
+
+        // Display contacts list
+        function displayContacts() {
+            const contactsList = document.getElementById('contacts-list');
+            
+            if (contacts.length === 0) {
+                contactsList.innerHTML = '<div class="no-messages">No contacts yet</div>';
+                return;
+            }
+
+            contactsList.innerHTML = contacts.map(contact => {
+                const lastMessagePreview = contact.isLastMessageSent 
+                    ? `You: ${contact.lastMessage}` 
+                    : contact.lastMessage;
+                
+                return `
+                    <div class="contact-item" onclick="selectContact('${contact.number}')">
+                        <div class="contact-avatar">${getContactInitials(contact.displayName)}</div>
+                        <div class="contact-info">
+                            <div class="contact-name">${contact.displayName}</div>
+                            <div class="contact-last-message">${lastMessagePreview}</div>
+                        </div>
+                        <div class="contact-time">${formatTime(contact.lastTime)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Select a contact
+        function selectContact(phoneNumber) {
+            currentContact = phoneNumber;
+            
+            // Update active contact
+            document.querySelectorAll('.contact-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Show chat view
+            document.getElementById('no-contact-selected').style.display = 'none';
+            document.getElementById('chat-view').style.display = 'flex';
+            
+            // Update contact number header based on toggle state
+            updateContactHeader(phoneNumber);
+            
+            // Display messages for this contact
+            displayContactMessages(phoneNumber);
+        }
+
+        // Toggle phone number display
+        function togglePhoneNumber() {
+            showPhoneNumber = !showPhoneNumber;
+            const toggleBtn = document.getElementById('phone-toggle-btn');
+            
+            if (showPhoneNumber) {
+                toggleBtn.textContent = '👤';
+                toggleBtn.title = 'Show Name Only';
+                toggleBtn.classList.add('active');
+            } else {
+                toggleBtn.textContent = '📱';
+                toggleBtn.title = 'Show Phone Number';
+                toggleBtn.classList.remove('active');
+            }
+            
+            // Update header if a contact is selected
+            if (currentContact) {
+                updateContactHeader(currentContact);
+            }
+        }
+
+        // Update contact header based on toggle state
+        function updateContactHeader(phoneNumber) {
+            const selectedContact = contacts.find(c => c.number === phoneNumber);
+            let headerName;
+            
+            if (showPhoneNumber) {
+                // Show name with phone number
+                if (selectedContact && selectedContact.contactNameOnly) {
+                    headerName = `${selectedContact.contactNameOnly} (${formatPhoneNumber(phoneNumber)})`;
+                } else {
+                    headerName = formatPhoneNumber(phoneNumber);
+                }
+            } else {
+                // Show name only
+                if (selectedContact && selectedContact.contactNameOnly) {
+                    headerName = selectedContact.contactNameOnly;
+                } else {
+                    headerName = formatPhoneNumber(phoneNumber);
+                }
+            }
+            
+            document.getElementById('chat-contact-number-display').textContent = headerName;
+        }
+
+        // Display messages for selected contact - V8.0 HEIGHT FIXED
+        function displayContactMessages(phoneNumber) {
+            console.log('🚀 V8.0 HEIGHT FIXED: displayContactMessages called for', phoneNumber);
+            
+            const messagesContainer = document.getElementById('messages-container');
+            
+            // Get messages for this contact
+            const contactMessages = allMessages.filter(msg => 
+                msg.sender_number === phoneNumber || 
+                msg.sender_number === `sent_to_${phoneNumber}`
+            );
+            
+            console.log('🚀 V8.0 HEIGHT FIXED: Found', contactMessages.length, 'messages');
+            
+            if (contactMessages.length === 0) {
+                messagesContainer.innerHTML = '<div class="no-messages">No messages with this contact</div>';
+                return;
+            }
+
+            // Sort messages by time
+            contactMessages.sort((a, b) => new Date(a.received_at) - new Date(b.received_at));
+            
+            // Build HTML string
+            let html = '';
+            
+            contactMessages.forEach(message => {
+                const isSent = message.sender_number.startsWith('sent_to_');
+                const rowClass = isSent ? 'sent' : 'received';
+                
+                html += `
+                    <div class="message-row ${rowClass}">
+                        <div class="message-bubble">${message.message_content}</div>
+                        <div class="message-time">${formatTime(message.received_at)}</div>
+                    </div>
+                `;
+            });
+            
+            // Set HTML
+            messagesContainer.innerHTML = html;
+            
+            console.log('🚀 V8.0 HEIGHT FIXED: HTML set, messages should be visible now');
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Display messages
+        function displayMessages(messages) {
+            const messagesList = document.getElementById('messagesList');
+            
+            if (messages.length === 0) {
+                messagesList.innerHTML = '<div class="no-messages">No messages received yet</div>';
+                return;
+            }
+
+            messagesList.innerHTML = messages.map(message => `
+                <div class="message-item">
+                    <div class="message-header">
+                        <span>📱 ${message.sender_number}</span>
+                        <span>${new Date(message.received_at).toLocaleString()}</span>
+                    </div>
+                    <div class="message-content">${message.message_content}</div>
+                </div>
+            `).join('');
+        }
+
+        // Utility functions
+        function getContactInitials(phoneNumber) {
+            return phoneNumber.slice(-2);
+        }
+
+        function formatPhoneNumber(phoneNumber) {
+            // Simple formatting - you can enhance this
+            if (phoneNumber.length > 10) {
+                return `+${phoneNumber}`;
+            }
+            return phoneNumber;
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 24 * 60 * 60 * 1000) { // Less than 24 hours
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else if (diff < 7 * 24 * 60 * 60 * 1000) { // Less than 7 days
+                return date.toLocaleDateString([], { weekday: 'short' });
+            } else {
+                return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            }
+        }
+
+        // Filter contacts based on search
+        function filterContacts(searchTerm) {
+            const filteredContacts = contacts.filter(contact => 
+                contact.number.includes(searchTerm) || 
+                contact.lastMessage.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            const contactsList = document.getElementById('contacts-list');
+            contactsList.innerHTML = filteredContacts.map(contact => {
+                const lastMessagePreview = contact.isLastMessageSent 
+                    ? `You: ${contact.lastMessage}` 
+                    : contact.lastMessage;
+                
+                return `
+                    <div class="contact-item" onclick="selectContact('${contact.number}')">
+                        <div class="contact-avatar">${getContactInitials(contact.number)}</div>
+                        <div class="contact-info">
+                            <div class="contact-name">${formatPhoneNumber(contact.number)}</div>
+                            <div class="contact-last-message">${lastMessagePreview}</div>
+                        </div>
+                        <div class="contact-time">${formatTime(contact.lastTime)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Send message
+        async function sendMessage() {
+            if (!currentContact || !currentTriggerId) {
+                showError('Please select a contact first');
+                return;
+            }
+            
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                showError('Please enter a message');
+                return;
+            }
+            
+            const sendBtn = document.getElementById('send-btn');
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '⏳';
+            
+            try {
+                const response = await fetch(`/api/triggers/${currentTriggerId}/send`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        to_number: currentContact,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Clear input
+                    messageInput.value = '';
+                    messageInput.style.height = 'auto';
+                    
+                    // Add sent message to UI immediately
+                    addSentMessageToUI(message);
+                    
+                    // Reload messages to get updated list
+                    await loadMessages(currentTriggerId);
+                    await loadContacts();
+                    
+                    showSuccess('Message sent successfully!');
+                } else {
+                    showError(data.error || 'Failed to send message');
+                }
+            } catch (error) {
+                showError('Error sending message: ' + error.message);
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '➤';
+            }
+        }
+        
+        // Add sent message to UI immediately - V8.0 HEIGHT FIXED
+        function addSentMessageToUI(message) {
+            const messagesContainer = document.getElementById('messages-container');
+            
+            const html = `
+                <div class="message-row sent">
+                    <div class="message-bubble">${message}</div>
+                    <div class="message-time">${formatTime(new Date().toISOString())}</div>
+                </div>
+            `;
+            
+            messagesContainer.innerHTML += html;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Start message polling for auto-refresh
+        function startMessagePolling() {
+            // Clear any existing interval
+            stopMessagePolling();
+            
+            // Poll for new messages every 3 seconds
+            messagePollingInterval = setInterval(async () => {
+                if (currentTriggerId) {
+                    await checkForNewMessages();
+                }
+            }, 3000);
+        }
+        
+        // Stop message polling
+        function stopMessagePolling() {
+            if (messagePollingInterval) {
+                clearInterval(messagePollingInterval);
+                messagePollingInterval = null;
+            }
+        }
+
+        // Start dashboard polling for auto-refresh
+        function startDashboardPolling() {
+            // Clear any existing interval
+            stopDashboardPolling();
+            
+            // Start polling every 5 seconds
+            dashboardPollingInterval = setInterval(async () => {
+                await checkForNewDashboardMessages();
+            }, 5000);
+            
+            console.log('🔄 Dashboard polling started');
+        }
+
+        // Stop dashboard polling
+        function stopDashboardPolling() {
+            if (dashboardPollingInterval) {
+                clearInterval(dashboardPollingInterval);
+                dashboardPollingInterval = null;
+            }
+        }
+
+        // Check for new dashboard messages
+        async function checkForNewDashboardMessages() {
+            try {
+                const response = await fetch('/api/dashboard/messages');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Get current dashboard content
+                    const currentContainer = document.getElementById('dashboard-messages');
+                    const currentContent = currentContainer.innerHTML;
+                    
+                    // Update dashboard
+                    displayDashboardMessages(data.data);
+                    
+                    // Check if content changed (new messages)
+                    const newContent = currentContainer.innerHTML;
+                    if (currentContent !== newContent) {
+                        console.log('📊 Dashboard updated with new messages');
+                        // Show a subtle notification
+                        showDashboardUpdateNotification();
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking for new dashboard messages:', error);
+            }
+        }
+
+        // Show dashboard update notification
+        function showDashboardUpdateNotification() {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #25d366;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = '📊 Dashboard updated';
+            
+            // Add animation keyframes if not already added
+            if (!document.getElementById('dashboard-notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'dashboard-notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 2 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 2000);
+        }
+        
+        // Check for new messages and update UI
+        async function checkForNewMessages() {
+            if (!currentTriggerId) return;
+            
+            try {
+                const response = await fetch(`/api/triggers/${currentTriggerId}/messages`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const newMessages = data.data;
+                    const previousMessageCount = allMessages.length;
+                    
+                    // Check if there are new messages
+                    if (newMessages.length > previousMessageCount) {
+                        allMessages = newMessages;
+                        
+                        // Reload contacts to update last message previews
+                        await loadContacts();
+                        
+                        // If we're viewing a specific contact, refresh their messages
+                        if (currentContact) {
+                            displayContactMessages(currentContact);
+                        }
+                        
+                        // Show notification for new messages
+                        const newMessageCount = newMessages.length - previousMessageCount;
+                        if (newMessageCount > 0) {
+                            showNewMessageNotification(newMessageCount);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking for new messages:', error);
+            }
+        }
+
+        // Refresh messages
+        function refreshMessages() {
+            if (currentTriggerId) {
+                loadMessages(currentTriggerId);
+            }
+        }
+
+        // Add trigger form submission
+        document.getElementById('addTriggerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/api/triggers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Trigger created successfully!');
+                    closeModal('addTriggerModal');
+                    e.target.reset();
+                    loadTriggers();
+                } else {
+                    showError(result.error || 'Failed to create trigger');
+                }
+            } catch (error) {
+                showError('Error creating trigger: ' + error.message);
+            }
+        });
+
+        // Modal functions
+        function openAddTriggerModal() {
+            document.getElementById('addTriggerModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        // Show new message notification
+        function showNewMessageNotification(count) {
+            const notification = document.createElement('div');
+            notification.className = 'new-message-indicator';
+            notification.innerHTML = `📨 ${count} new message${count > 1 ? 's' : ''} received`;
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+
+        // Notification functions
+        function showSuccess(message) {
+            showNotification(message, 'success');
+        }
+
+        function showError(message) {
+            showNotification(message, 'error');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                max-width: 400px;
+                ${type === 'success' ? 'background: #25d366;' : 'background: #dc3545;'}
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
