@@ -813,6 +813,215 @@
                 padding: 20px;
             }
         }
+
+        /* Lead Management Styles */
+        .lead-management-content {
+            margin-top: 20px;
+        }
+
+        .lead-tabs {
+            display: flex;
+            border-bottom: 2px solid #e1e5e9;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #25d366;
+            border-bottom-color: #25d366;
+        }
+
+        .tab-btn:hover {
+            color: #25d366;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .questions-header, .leads-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .leads-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .questions-header h3, .leads-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .questions-list, .leads-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .question-item, .lead-item {
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .question-item h4, .lead-item h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        .question-meta, .lead-meta {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .question-actions, .lead-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .lead-responses {
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .response-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .response-item:last-child {
+            border-bottom: none;
+        }
+
+        .response-question {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .response-answer {
+            color: #666;
+        }
+
+        .lead-info {
+            background: #e8f5e8;
+            border: 1px solid #25d366;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .lead-info p {
+            margin: 0;
+            color: #2d5a2d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Settings Tab Styles */
+        .settings-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .settings-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .settings-content {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .setting-item {
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .setting-item h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        .setting-item p {
+            margin: 0 0 15px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .setting-item textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .setting-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .setting-preview {
+            background: #e8f5e8;
+            border: 1px solid #25d366;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .setting-preview h4 {
+            margin: 0 0 15px 0;
+            color: #2d5a2d;
+        }
+
+        .message-preview {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            min-height: 100px;
+        }
     </style>
 </head>
 <body>
@@ -937,6 +1146,80 @@
                     <button type="submit" class="btn btn-primary">Create Trigger</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Lead Management Modal -->
+    <div id="leadManagementModal" class="modal">
+        <div class="modal-content" style="max-width: 900px; max-height: 80vh; overflow-y: auto;">
+            <span class="close" onclick="closeModal('leadManagementModal')">&times;</span>
+            <h2 id="leadModalTitle">📋 Lead Management</h2>
+            <div class="lead-management-content">
+                <div class="lead-tabs">
+                    <button class="tab-btn active" onclick="showLeadTab('questions')">❓ Questions</button>
+                    <button class="tab-btn" onclick="showLeadTab('leads')">👥 Leads</button>
+                    <button class="tab-btn" onclick="showLeadTab('settings')">⚙️ Settings</button>
+                </div>
+                
+                <!-- Questions Tab -->
+                <div id="questionsTab" class="tab-content active">
+                    <div class="questions-header">
+                        <h3>Lead Generation Questions</h3>
+                        <button class="btn btn-primary" onclick="addQuestion()">➕ Add Question</button>
+                    </div>
+                    <div class="lead-info">
+                        <p><strong>🎯 Interactive Lead Generation:</strong> When customers message your WhatsApp number, they'll receive a welcome message with interactive buttons. Multiple choice questions will be sent as clickable buttons for better user experience!</p>
+                    </div>
+                    <div id="questionsList" class="questions-list">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading questions...
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Leads Tab -->
+                <div id="leadsTab" class="tab-content">
+                    <div class="leads-header">
+                        <h3>Generated Leads</h3>
+                        <div class="leads-actions">
+                            <button class="btn btn-secondary" onclick="refreshLeads()">🔄 Refresh</button>
+                            <button class="btn btn-danger" onclick="deleteAllLeads()">🗑️ Delete All</button>
+                        </div>
+                    </div>
+                    <div id="leadsList" class="leads-list">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading leads...
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Tab -->
+                <div id="settingsTab" class="tab-content">
+                    <div class="settings-header">
+                        <h3>Lead Generation Settings</h3>
+                    </div>
+                    <div class="settings-content">
+                        <div class="setting-item">
+                            <h4>📝 Completion Message</h4>
+                            <p>Customize the message sent to customers after they complete all questions.</p>
+                            <textarea id="completionMessage" rows="8" placeholder="Enter your custom completion message here..."></textarea>
+                            <div class="setting-actions">
+                                <button class="btn btn-primary" onclick="saveCompletionMessage()">💾 Save Message</button>
+                                <button class="btn btn-secondary" onclick="resetCompletionMessage()">🔄 Reset to Default</button>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-preview">
+                            <h4>👁️ Preview</h4>
+                            <div id="messagePreview" class="message-preview">
+                                <p>Your completion message will appear here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1140,6 +1423,9 @@
                         </button>
                         <button class="btn btn-secondary" onclick="openWhatsAppChat(${trigger.id}, '${trigger.business_name}')">
                             💬 Chat
+                        </button>
+                        <button class="btn btn-info" onclick="manageLeads(${trigger.id}, '${trigger.business_name}')">
+                            📋 Leads
                         </button>
                         <button class="btn btn-danger" onclick="deleteTrigger(${trigger.id}, '${trigger.business_name}')">
                             🗑️ Delete
@@ -1774,6 +2060,324 @@
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Lead Management Functions
+        let currentLeadTriggerId = null;
+
+        function manageLeads(triggerId, businessName) {
+            currentLeadTriggerId = triggerId;
+            document.getElementById('leadModalTitle').textContent = `📋 Lead Management - ${businessName}`;
+            document.getElementById('leadManagementModal').style.display = 'block';
+            loadQuestions();
+            loadLeads();
+            loadCompletionMessage();
+        }
+
+        function showLeadTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function loadQuestions() {
+            if (!currentLeadTriggerId) return;
+
+            try {
+                const response = await fetch(`/api/triggers/${currentLeadTriggerId}/questions`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayQuestions(data.data);
+                } else {
+                    document.getElementById('questionsList').innerHTML = 
+                        '<div class="no-data">No questions found</div>';
+                }
+            } catch (error) {
+                document.getElementById('questionsList').innerHTML = 
+                    '<div class="no-data">Error loading questions</div>';
+            }
+        }
+
+        function displayQuestions(questions) {
+            const container = document.getElementById('questionsList');
+            
+            if (questions.length === 0) {
+                container.innerHTML = '<div class="no-data">No questions configured. Add some questions to start lead generation!</div>';
+                return;
+            }
+
+            container.innerHTML = questions.map(question => `
+                <div class="question-item">
+                    <h4>${question.question_text}</h4>
+                    <div class="question-meta">
+                        Type: ${question.question_type} | 
+                        Required: ${question.is_required ? 'Yes' : 'No'} | 
+                        Order: ${question.order_index}
+                    </div>
+                    ${question.question_type === 'multiple_choice' ? 
+                        `<div><strong>Options:</strong> ${JSON.parse(question.options).join(', ')}</div>` : 
+                        ''
+                    }
+                    <div class="question-actions">
+                        <button class="btn btn-sm btn-secondary" onclick="editQuestion(${question.id})">✏️ Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteQuestion(${question.id})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadLeads() {
+            if (!currentLeadTriggerId) return;
+
+            try {
+                const response = await fetch(`/api/triggers/${currentLeadTriggerId}/leads`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayLeads(data.data);
+                } else {
+                    document.getElementById('leadsList').innerHTML = 
+                        '<div class="no-data">No leads found</div>';
+                }
+            } catch (error) {
+                document.getElementById('leadsList').innerHTML = 
+                    '<div class="no-data">Error loading leads</div>';
+            }
+        }
+
+        function displayLeads(leads) {
+            const container = document.getElementById('leadsList');
+            
+            if (leads.length === 0) {
+                container.innerHTML = '<div class="no-data">No leads generated yet. When customers message your WhatsApp number, they will be asked these questions automatically!</div>';
+                return;
+            }
+
+            container.innerHTML = leads.map(lead => `
+                <div class="lead-item">
+                    <h4>${lead.contact_name || 'Unknown Contact'} (${lead.phone_number})</h4>
+                    <div class="lead-meta">
+                        Status: <span class="status-${lead.status}">${lead.status}</span> | 
+                        Created: ${new Date(lead.created_at).toLocaleString()} |
+                        Progress: ${lead.current_question} questions answered
+                    </div>
+                    ${Object.keys(lead.responses).length > 0 ? `
+                        <div class="lead-responses">
+                            <strong>Responses:</strong>
+                            ${Object.entries(lead.responses).map(([key, value]) => `
+                                <div class="response-item">
+                                    <span class="response-question">Question ${key.replace('q', '')}:</span>
+                                    <span class="response-answer">${value}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="lead-actions">
+                        <button class="btn btn-sm btn-primary" onclick="viewLeadDetails(${lead.id})">👁️ View Details</button>
+                        <button class="btn btn-sm btn-success" onclick="exportLead(${lead.id})">📤 Export</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteLead(${lead.id}, '${lead.contact_name || 'Unknown Contact'}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addQuestion() {
+            const questionText = prompt('Enter your question:');
+            if (!questionText) return;
+
+            const questionType = prompt('Question type (text/multiple_choice):', 'text');
+            let options = [];
+            
+            if (questionType === 'multiple_choice') {
+                const optionsText = prompt('Enter options separated by commas:');
+                if (optionsText) {
+                    options = optionsText.split(',').map(opt => opt.trim());
+                }
+            }
+
+            const isRequired = confirm('Is this question required?');
+            const orderIndex = parseInt(prompt('Order index (0 for first):', '0')) || 0;
+
+            createQuestion({
+                question_text: questionText,
+                question_type: questionType,
+                options: options,
+                is_required: isRequired,
+                order_index: orderIndex
+            });
+        }
+
+        async function createQuestion(questionData) {
+            try {
+                const response = await fetch(`/api/triggers/${currentLeadTriggerId}/questions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(questionData)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess('Question added successfully!');
+                    loadQuestions();
+                } else {
+                    showError('Failed to add question');
+                }
+            } catch (error) {
+                showError('Error adding question: ' + error.message);
+            }
+        }
+
+        function refreshLeads() {
+            loadLeads();
+        }
+
+        function viewLeadDetails(leadId) {
+            alert('Lead details view - Coming soon!');
+        }
+
+        function exportLead(leadId) {
+            alert('Lead export - Coming soon!');
+        }
+
+        // Completion Message Functions
+        async function loadCompletionMessage() {
+            if (!currentLeadTriggerId) return;
+
+            try {
+                const response = await fetch(`/api/triggers/${currentLeadTriggerId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const trigger = data.data;
+                    const completionMessage = trigger.completion_message || '';
+                    document.getElementById('completionMessage').value = completionMessage;
+                    updateMessagePreview();
+                }
+            } catch (error) {
+                console.error('Error loading completion message:', error);
+            }
+        }
+
+        async function saveCompletionMessage() {
+            if (!currentLeadTriggerId) return;
+
+            const message = document.getElementById('completionMessage').value;
+
+            try {
+                const response = await fetch(`/api/triggers/${currentLeadTriggerId}/completion-message`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        completion_message: message
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess('Completion message saved successfully!');
+                    updateMessagePreview();
+                } else {
+                    showError('Failed to save completion message: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error saving completion message: ' + error.message);
+            }
+        }
+
+        function resetCompletionMessage() {
+            if (confirm('Are you sure you want to reset to the default completion message?')) {
+                document.getElementById('completionMessage').value = '';
+                updateMessagePreview();
+            }
+        }
+
+        function updateMessagePreview() {
+            const message = document.getElementById('completionMessage').value;
+            const preview = document.getElementById('messagePreview');
+            
+            if (message.trim()) {
+                preview.textContent = message;
+            } else {
+                preview.textContent = `🎉 Thank you for providing all the information!
+
+Our team has received your details and will contact you within 24 hours to discuss your requirements.
+
+We appreciate your interest and look forward to helping you! 
+
+If you have any urgent questions, feel free to message us anytime.
+
+Best regards,
+Your Team`;
+            }
+        }
+
+        // Add event listener for real-time preview
+        document.addEventListener('DOMContentLoaded', function() {
+            const completionMessageTextarea = document.getElementById('completionMessage');
+            if (completionMessageTextarea) {
+                completionMessageTextarea.addEventListener('input', updateMessagePreview);
+            }
+        });
+
+        async function deleteLead(leadId, contactName) {
+            if (!confirm(`Are you sure you want to delete the lead for "${contactName}"? This action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/triggers/${currentLeadTriggerId}/leads/${leadId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess('Lead deleted successfully!');
+                    loadLeads(); // Refresh the leads list
+                } else {
+                    showError('Failed to delete lead: ' + data.message);
+                }
+            } catch (error) {
+                showError('Error deleting lead: ' + error.message);
+            }
+        }
+
+        async function deleteAllLeads() {
+            if (!confirm('Are you sure you want to delete ALL leads for this trigger? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/triggers/${currentLeadTriggerId}/leads`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(data.message);
+                    loadLeads(); // Refresh the leads list
+                } else {
+                    showError('Failed to delete leads: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error deleting leads: ' + error.message);
+            }
         }
 
         // Close modal when clicking outside
